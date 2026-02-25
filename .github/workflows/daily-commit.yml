@@ -2,26 +2,30 @@ name: Daily Commit by Mohit
 
 on:
   schedule:
-    - cron: '30 3 * * *'  # Runs daily at 3:30 AM UTC
-  workflow_dispatch:  # Allows manual testing
+    - cron: '30 3 * * *'  # 3:30 AM UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo by 22f2001198@ds.study.iitm.ac.in
+      - name: Checkout by 22f2001198@ds.study.iitm.ac.in  # ← FIXED: Email in step name
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Update last-run.txt
+      - name: Update status file
         run: |
-          echo "Last run: $(date -u)" > last-run.txt
+          echo "Last run: $(date -u)" > status.txt
 
-      - name: Commit changes
+      - name: Commit changes by 22f2001198@ds.study.iitm.ac.in  # ← Email here too (safer)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add last-run.txt
+          git add status.txt
           git commit -m "Daily update: $(date -u)" || echo "No changes"
-          git push
+          git push origin HEAD:${{ github.ref_name }}
